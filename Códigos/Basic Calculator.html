@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Basic Calculator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f5f3ee;
+        --surface: #ffffff;
+        --border: #e2ddd6;
+        --text: #1a1814;
+        --muted: #9c9589;
+        --accent: #c47b00;
+        --accent-lt: #fdf3e3;
+        --error: #c0392b;
+        --ok: #2d6a4f;
+        --radius: 12px;
+        --mono: "DM Mono", monospace;
+        --sans: "DM Sans", sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+      }
+
+      .calc-header {
+        margin-bottom: 8px;
+        padding: 0 4px;
+      }
+      .calc-header .build-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+      }
+      .calc-header .title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+
+      .build-select-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .build-label {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      #selectBuild {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--text);
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      #selectBuild:focus {
+        border-color: var(--accent);
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 28px 28px 24px;
+        box-shadow:
+          0 2px 12px rgba(0, 0, 0, 0.06),
+          0 1px 3px rgba(0, 0, 0, 0.04);
+      }
+
+      .error-bar {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--error);
+        min-height: 20px;
+        margin-bottom: 16px;
+        letter-spacing: 0.01em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .error-bar:not(:empty)::before {
+        content: "!";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--error);
+        color: white;
+        font-size: 0.65rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+      .field label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 5px;
+      }
+      .field input[type="text"],
+      .field select {
+        width: 100%;
+        font-family: var(--mono);
+        font-size: 0.95rem;
+        color: var(--text);
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        outline: none;
+        transition:
+          border-color 0.18s,
+          background 0.18s,
+          box-shadow 0.18s;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .field input[type="text"]:focus,
+      .field select:focus {
+        border-color: var(--accent);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(196, 123, 0, 0.08);
+      }
+
+      .fields-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+      .select-wrap::after {
+        content: "";
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid var(--muted);
+        pointer-events: none;
+      }
+
+      .divider {
+        border: none;
+        border-top: 1.5px solid var(--border);
+        margin: 18px 0;
+      }
+
+      .int-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        padding: 10px 14px;
+        background: var(--accent-lt);
+        border: 1.5px solid #f0d9a8;
+        border-radius: 8px;
+        transition: opacity 0.2s;
+      }
+      .int-row.hidden-row {
+        display: none;
+      }
+      .int-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .int-row label {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--accent);
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .btn-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+      .btn {
+        font-family: var(--sans);
+        font-size: 0.88rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.18s;
+        letter-spacing: 0.01em;
+      }
+      .btn-primary {
+        background: var(--text);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #333;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--muted);
+        border: 1.5px solid var(--border);
+      }
+      .btn-secondary:hover {
+        border-color: var(--muted);
+        color: var(--text);
+      }
+      .btn-secondary:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .answer-inline {
+        margin-top: 24px;
+        text-align: center;
+      }
+      .ans-value {
+        font-family: var(--mono);
+        font-size: 2.8rem;
+        font-weight: 300;
+        color: var(--text);
+        letter-spacing: -0.03em;
+        word-break: break-all;
+        transition: color 0.25s;
+        display: block;
+      }
+      .ans-value.is-error {
+        color: var(--error);
+        font-size: 0.9rem;
+        font-weight: 400;
+      }
+      .ans-value.is-ok {
+        color: var(--ok);
+      }
+      .ans-value.is-empty {
+        color: var(--border);
+      }
+
+      .calculating-bar {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0 4px;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+      }
+      .calculating-bar.visible {
+        display: flex;
+      }
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .calc-footer {
+        margin-top: 14px;
+        padding: 0 4px;
+        font-size: 0.68rem;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="calc-header">
+        <div class="build-row">
+          <span class="title">Calculator</span>
+          <div class="build-select-wrap">
+            <span class="build-label">Build</span>
+            <select
+              id="selectBuild"
+              data-testid="selectBuild"
+              onchange="buildChanged()"
+            >
+              <option value="0">Prototype</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div
+          class="error-bar"
+          id="errorMsgField"
+          data-testid="errorMsgField"
+        ></div>
+
+        <div class="fields-row">
+          <div class="field">
+            <label>First number</label>
+            <input
+              id="number1Field"
+              data-testid="number1Field"
+              type="text"
+              maxlength="10"
+              placeholder="0"
+              autocomplete="off"
+            />
+          </div>
+          <div class="field">
+            <label>Second number</label>
+            <input
+              id="number2Field"
+              data-testid="number2Field"
+              type="text"
+              maxlength="10"
+              placeholder="0"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Operation</label>
+          <div class="select-wrap">
+            <select
+              id="selectOperationDropdown"
+              data-testid="selectOperationDropdown"
+              onchange="operationChanged()"
+            >
+              <option value="0">Add</option>
+              <option value="1">Subtract</option>
+              <option value="2">Multiply</option>
+              <option value="3">Divide</option>
+              <option value="4">Concatenate</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="int-row" id="intRow">
+          <input
+            type="checkbox"
+            id="integerSelect"
+            data-testid="integerSelect"
+            onchange="displayAnswer()"
+          />
+          <label for="integerSelect">Integers only</label>
+        </div>
+
+        <div class="btn-row">
+          <button
+            class="btn btn-primary"
+            id="calculateButton"
+            data-testid="calculateButton"
+            onclick="calculate()"
+          >
+            Calculate
+          </button>
+          <button
+            class="btn btn-secondary"
+            id="clearButton"
+            data-testid="clearButton"
+            onclick="clearAnswer()"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div class="answer-inline" id="answerForm">
+          <div class="calculating-bar" id="calculatingBar">
+            <div class="spinner"></div>
+            <span>Calculating...</span>
+          </div>
+          <div
+            class="ans-value is-empty"
+            id="numberAnswerField"
+            data-testid="numberAnswerField"
+          >
+            —
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-footer">
+        <span>Versión corregida · Builds 1–8</span>
+        <span>© David Ospino 2026</span>
+      </div>
+    </div>
+
+    <script>
+      var errorMsg = "";
+      var answer = "";
+      var isNumber = true;
+      var selectedBuild = 0;
+
+      /*
+       * CORRECCIONES APLICADAS:
+       * BUILD 1 - Ahora SÍ valida entradas numéricas (isNaN check siempre activo)
+       * BUILD 2 - Add suma y Concatenate concatena (no invertidos)
+       * BUILD 3 - Concatenate NO trata entradas como números
+       * BUILD 4 - Integers only es opcional, no bloqueado
+       * BUILD 5 - Botón Clear siempre habilitado
+       * BUILD 6 - División por cero siempre validada
+       * BUILD 7 - Siempre usa number1Field, nunca el answer anterior
+       * BUILD 8 - Nunca intercambia num1 y num2
+       */
+
+      function setStatusError() {
+        document.getElementById("errorMsgField").textContent = errorMsg;
+      }
+
+      function setIfMathematical() {
+        var selection = document.getElementById(
+          "selectOperationDropdown",
+        ).value;
+        // CORRECCIÓN BUILD 3: siempre evalúa correctamente si es matemática
+        isNumber = selection != 4;
+      }
+
+      function lockCalculate() {
+        document.getElementById("calculateButton").disabled = true;
+        document.getElementById("calculatingBar").classList.add("visible");
+        document.getElementById("answerForm").style.opacity = "0.4";
+      }
+
+      function unlockCalculate() {
+        document.getElementById("calculateButton").disabled = false;
+        document.getElementById("calculatingBar").classList.remove("visible");
+        document.getElementById("answerForm").style.opacity = "1";
+      }
+
+      function calculate() {
+        errorMsg = "";
+        setIfMathematical();
+        lockCalculate();
+
+        var selection = document.getElementById(
+          "selectOperationDropdown",
+        ).value;
+
+        // CORRECCIÓN BUILD 7: siempre lee number1Field, nunca reutiliza answer
+        // CORRECCIÓN BUILD 8: nunca intercambia num1 y num2
+        var num1 = document.getElementById("number1Field").value;
+        var num2 = document.getElementById("number2Field").value;
+
+        // CORRECCIÓN BUILD 1: validación siempre activa (sin condición selectedBuild != 1)
+        // CORRECCIÓN BUILD 3: isNumber es false para Concatenate, no valida texto
+        if (isNaN(num1) && isNumber) {
+          errorMsg = "Number 1 is not a number";
+          setStatusError();
+          unlockCalculate();
+          return;
+        }
+        if (isNaN(num2) && isNumber) {
+          errorMsg = "Number 2 is not a number";
+          setStatusError();
+          unlockCalculate();
+          return;
+        }
+
+        switch (+selection) {
+          case 0:
+            // CORRECCIÓN BUILD 2: Add siempre suma
+            answer = +num1 + +num2;
+            break;
+          case 1:
+            // CORRECCIÓN BUILD 8: orden correcto num1 - num2
+            answer = num1 - num2;
+            break;
+          case 2:
+            // CORRECCIÓN BUILD 8: orden correcto num1 * num2
+            answer = num1 * num2;
+            break;
+          case 3:
+            // CORRECCIÓN BUILD 6: división por cero siempre validada
+            if (num2 == 0) {
+              errorMsg = "Divide by zero error!";
+              setStatusError();
+              unlockCalculate();
+              return;
+            }
+            // CORRECCIÓN BUILD 8: orden correcto num1 / num2
+            answer = num1 / num2;
+            break;
+          default:
+            // CORRECCIÓN BUILD 2: Concatenate siempre une texto
+            // CORRECCIÓN BUILD 8: orden correcto num1 + num2
+            answer = num1 + num2;
+            break;
+        }
+
+        displayAnswer();
+        setStatusError();
+
+        var randomTimeout = parseInt(Math.random() * 1000);
+        setTimeout(unlockCalculate, randomTimeout);
+      }
+
+      function clearAnswer() {
+        errorMsg = "";
+        answer = "";
+        setStatusError();
+        var el = document.getElementById("numberAnswerField");
+        el.textContent = "—";
+        el.className = "ans-value is-empty";
+        document.getElementById("integerSelect").checked = false;
+      }
+
+      function displayAnswer() {
+        var el = document.getElementById("numberAnswerField");
+        if (answer === "") {
+          el.textContent = "—";
+          el.className = "ans-value is-empty";
+          return;
+        }
+
+        var display = answer;
+        // CORRECCIÓN BUILD 4: parseInt solo si el usuario lo marcó voluntariamente
+        if (document.getElementById("integerSelect").checked && answer !== "") {
+          display = parseInt(answer);
+        }
+
+        el.textContent = display;
+        el.className = errorMsg ? "ans-value is-error" : "ans-value is-ok";
+      }
+
+      function buildChanged() {
+        selectedBuild = document.getElementById("selectBuild").value;
+        setIfMathematical();
+        setFieldStatus();
+        // CORRECCIÓN BUILD 5: Clear siempre habilitado
+        document.getElementById("clearButton").disabled = false;
+      }
+
+      function operationChanged() {
+        setIfMathematical();
+        setFieldStatus();
+      }
+
+      function setFieldStatus() {
+        var intRow = document.getElementById("intRow");
+        var intChk = document.getElementById("integerSelect");
+        // CORRECCIÓN BUILD 4: Integers only siempre opcional, nunca forzado
+        if (isNumber) {
+          intRow.classList.remove("hidden-row");
+          intChk.disabled = false;
+        } else {
+          intRow.classList.add("hidden-row");
+          intChk.disabled = true;
+          intChk.checked = false;
+        }
+      }
+    </script>
+  </body>
+</html>
