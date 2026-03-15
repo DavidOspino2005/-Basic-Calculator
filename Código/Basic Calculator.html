@@ -22,7 +22,9 @@
         --accent: #c47b00;
         --accent-lt: #fdf3e3;
         --error: #c0392b;
+        --error-lt: #fdf0ee;
         --ok: #2d6a4f;
+        --ok-lt: #eaf4ee;
         --radius: 12px;
         --mono: "DM Mono", monospace;
         --sans: "DM Sans", sans-serif;
@@ -41,9 +43,9 @@
         background: var(--bg);
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        padding: 40px 20px;
+        padding: 40px 24px;
       }
 
       body::before {
@@ -55,11 +57,24 @@
         z-index: 0;
       }
 
-      .wrapper {
+      .page {
         position: relative;
         z-index: 1;
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
         width: 100%;
-        max-width: 420px;
+        max-width: 960px;
+      }
+
+      .calc-col {
+        flex: 0 0 380px;
+        min-width: 0;
+      }
+
+      .panel-col {
+        flex: 1;
+        min-width: 0;
       }
 
       .calc-header {
@@ -70,7 +85,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 6px;
       }
       .calc-header .title {
         font-size: 1.5rem;
@@ -78,7 +92,6 @@
         color: var(--text);
         letter-spacing: -0.02em;
       }
-
       .build-select-wrap {
         display: flex;
         align-items: center;
@@ -203,12 +216,6 @@
         pointer-events: none;
       }
 
-      .divider {
-        border: none;
-        border-top: 1.5px solid var(--border);
-        margin: 18px 0;
-      }
-
       .int-row {
         display: flex;
         align-items: center;
@@ -218,7 +225,6 @@
         background: var(--accent-lt);
         border: 1.5px solid #f0d9a8;
         border-radius: 8px;
-        transition: opacity 0.2s;
       }
       .int-row.hidden-row {
         display: none;
@@ -253,7 +259,6 @@
         padding: 12px 20px;
         cursor: pointer;
         transition: all 0.18s;
-        letter-spacing: 0.01em;
       }
       .btn-primary {
         background: var(--text);
@@ -311,12 +316,12 @@
       .calculating-bar {
         display: none;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         padding: 10px 0 4px;
         font-family: var(--mono);
         font-size: 0.75rem;
         color: var(--muted);
-        letter-spacing: 0.06em;
       }
       .calculating-bar.visible {
         display: flex;
@@ -336,141 +341,307 @@
       }
 
       .calc-footer {
-        margin-top: 14px;
+        margin-top: 12px;
         padding: 0 4px;
         font-size: 0.68rem;
         color: var(--muted);
-        letter-spacing: 0.04em;
         display: flex;
         justify-content: space-between;
+      }
+
+      .panel-header {
+        padding: 0 4px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .panel-header .panel-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      .panel-header .panel-build-badge {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .panel-card {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow:
+          0 2px 12px rgba(0, 0, 0, 0.06),
+          0 1px 3px rgba(0, 0, 0, 0.04);
+      }
+
+      .panel-prototype {
+        padding: 40px 28px;
+        text-align: center;
+      }
+      .panel-prototype .proto-icon {
+        font-size: 2rem;
+        margin-bottom: 12px;
+        display: block;
+      }
+      .panel-prototype p {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+
+      .panel-section {
+        padding: 20px 22px 18px;
+      }
+      .panel-section + .panel-section {
+        border-top: 1.5px solid var(--border);
+      }
+
+      .section-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .section-label.bug {
+        color: var(--error);
+      }
+      .section-label.fix {
+        color: var(--ok);
+      }
+      .section-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .section-label.bug .dot {
+        background: var(--error);
+      }
+      .section-label.fix .dot {
+        background: var(--ok);
+      }
+
+      .bug-desc {
+        font-size: 0.82rem;
+        color: var(--text);
+        margin-bottom: 12px;
+        line-height: 1.5;
+      }
+
+      .code-block {
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 0.76rem;
+      }
+      .code-block .code-bar {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        padding: 5px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .code-block.buggy .code-bar {
+        background: #fdecea;
+        color: var(--error);
+      }
+      .code-block.fixed .code-bar {
+        background: #e8f5ec;
+        color: var(--ok);
+      }
+      .code-block pre {
+        font-family: var(--mono);
+        font-size: 0.73rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+        overflow-x: auto;
+        white-space: pre;
+        margin: 0;
+      }
+      .code-block.buggy pre {
+        background: var(--error-lt);
+        color: #7b1c12;
+      }
+      .code-block.fixed pre {
+        background: var(--ok-lt);
+        color: #1a3d2b;
+      }
+
+      .hl-err {
+        background: rgba(192, 57, 43, 0.12);
+        display: block;
+        margin: 0 -14px;
+        padding: 0 14px;
+      }
+      .hl-ok {
+        background: rgba(45, 106, 79, 0.12);
+        display: block;
+        margin: 0 -14px;
+        padding: 0 14px;
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          flex-direction: column;
+        }
+        .calc-col {
+          flex: none;
+          width: 100%;
+        }
       }
     </style>
   </head>
 
   <body>
-    <div class="wrapper">
-      <div class="calc-header">
-        <div class="build-row">
-          <span class="title">Calculator</span>
-          <div class="build-select-wrap">
-            <span class="build-label">Build</span>
-            <select
-              id="selectBuild"
-              data-testid="selectBuild"
-              onchange="buildChanged()"
-            >
-              <option value="0">Prototype</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div
-          class="error-bar"
-          id="errorMsgField"
-          data-testid="errorMsgField"
-        ></div>
-
-        <div class="fields-row">
-          <div class="field">
-            <label>First number</label>
-            <input
-              id="number1Field"
-              data-testid="number1Field"
-              type="text"
-              maxlength="10"
-              placeholder="0"
-              autocomplete="off"
-            />
-          </div>
-          <div class="field">
-            <label>Second number</label>
-            <input
-              id="number2Field"
-              data-testid="number2Field"
-              type="text"
-              maxlength="10"
-              placeholder="0"
-              autocomplete="off"
-            />
+    <div class="page">
+      <div class="calc-col">
+        <div class="calc-header">
+          <div class="build-row">
+            <span class="title">Calculator</span>
+            <div class="build-select-wrap">
+              <span class="build-label">Build</span>
+              <select
+                id="selectBuild"
+                data-testid="selectBuild"
+                onchange="buildChanged()"
+              >
+                <option value="0">Prototype</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div class="field">
-          <label>Operation</label>
-          <div class="select-wrap">
-            <select
-              id="selectOperationDropdown"
-              data-testid="selectOperationDropdown"
-              onchange="operationChanged()"
-            >
-              <option value="0">Add</option>
-              <option value="1">Subtract</option>
-              <option value="2">Multiply</option>
-              <option value="3">Divide</option>
-              <option value="4">Concatenate</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="int-row" id="intRow">
-          <input
-            type="checkbox"
-            id="integerSelect"
-            data-testid="integerSelect"
-            onchange="displayAnswer()"
-          />
-          <label for="integerSelect">Integers only</label>
-        </div>
-
-        <div class="btn-row">
-          <button
-            class="btn btn-primary"
-            id="calculateButton"
-            data-testid="calculateButton"
-            onclick="calculate()"
-          >
-            Calculate
-          </button>
-          <button
-            class="btn btn-secondary"
-            id="clearButton"
-            data-testid="clearButton"
-            onclick="clearAnswer()"
-          >
-            Clear
-          </button>
-        </div>
-
-        <div class="answer-inline" id="answerForm">
-          <div class="calculating-bar" id="calculatingBar">
-            <div class="spinner"></div>
-            <span>Calculating...</span>
-          </div>
+        <div class="card">
           <div
-            class="ans-value is-empty"
-            id="numberAnswerField"
-            data-testid="numberAnswerField"
-          >
-            —
+            class="error-bar"
+            id="errorMsgField"
+            data-testid="errorMsgField"
+          ></div>
+
+          <div class="fields-row">
+            <div class="field">
+              <label>First number</label>
+              <input
+                id="number1Field"
+                data-testid="number1Field"
+                type="text"
+                maxlength="10"
+                placeholder="0"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field">
+              <label>Second number</label>
+              <input
+                id="number2Field"
+                data-testid="number2Field"
+                type="text"
+                maxlength="10"
+                placeholder="0"
+                autocomplete="off"
+              />
+            </div>
           </div>
+
+          <div class="field">
+            <label>Operation</label>
+            <div class="select-wrap">
+              <select
+                id="selectOperationDropdown"
+                data-testid="selectOperationDropdown"
+                onchange="operationChanged()"
+              >
+                <option value="0">Add</option>
+                <option value="1">Subtract</option>
+                <option value="2">Multiply</option>
+                <option value="3">Divide</option>
+                <option value="4">Concatenate</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="int-row" id="intRow">
+            <input
+              type="checkbox"
+              id="integerSelect"
+              data-testid="integerSelect"
+              onchange="displayAnswer()"
+            />
+            <label for="integerSelect">Integers only</label>
+          </div>
+
+          <div class="btn-row">
+            <button
+              class="btn btn-primary"
+              id="calculateButton"
+              data-testid="calculateButton"
+              onclick="calculate()"
+            >
+              Calculate
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="clearButton"
+              data-testid="clearButton"
+              onclick="clearAnswer()"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div class="answer-inline" id="answerForm">
+            <div class="calculating-bar" id="calculatingBar">
+              <div class="spinner"></div>
+              <span>Calculating...</span>
+            </div>
+            <div
+              class="ans-value is-empty"
+              id="numberAnswerField"
+              data-testid="numberAnswerField"
+            >
+              —
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-footer">
+          <span>Versión corregida · Builds 1–8</span>
+          <span>© David Ospino 2026</span>
         </div>
       </div>
 
-      <div class="calc-footer">
-        <span>Versión corregida · Builds 1–8</span>
-        <span>© David Ospino 2026</span>
+      <div class="panel-col">
+        <div class="panel-header">
+          <span class="panel-title">Bug Inspector</span>
+          <span class="panel-build-badge" id="panelBadge">Prototype</span>
+        </div>
+
+        <div class="panel-card" id="bugPanel">
+          <!-- Content injected by JS -->
+        </div>
       </div>
     </div>
+    <!-- .page -->
 
     <script>
       var errorMsg = "";
@@ -478,17 +649,199 @@
       var isNumber = true;
       var selectedBuild = 0;
 
-      /*
-       * CORRECCIONES APLICADAS:
-       * BUILD 1 - Ahora SÍ valida entradas numéricas (isNaN check siempre activo)
-       * BUILD 2 - Add suma y Concatenate concatena (no invertidos)
-       * BUILD 3 - Concatenate NO trata entradas como números
-       * BUILD 4 - Integers only es opcional, no bloqueado
-       * BUILD 5 - Botón Clear siempre habilitado
-       * BUILD 6 - División por cero siempre validada
-       * BUILD 7 - Siempre usa number1Field, nunca el answer anterior
-       * BUILD 8 - Nunca intercambia num1 y num2
-       */
+      var buildData = {
+        0: null,
+        1: {
+          desc: "No valida si las entradas son numéricas. Si ingresas texto en campos matemáticos, en vez de mostrar un error opera igual y devuelve NaN.",
+          bugLabel: "Código con bug — condición que omite la validación",
+          bugCode: `if (isNaN(num1) && isNumber && selectedBuild != 1) {
+  errorMsg = "Number 1 is not a number";
+  // ↑ selectedBuild != 1 desactiva la validación
+  // en el Build 1, nunca entra aquí
+}`,
+          bugLine: 1,
+          fixLabel: "Corrección — validación siempre activa",
+          fixCode: `if (isNaN(num1) && isNumber) {
+  errorMsg = "Number 1 is not a number";
+  // ↑ Se eliminó la condición selectedBuild != 1
+  // Ahora valida en todos los builds
+}`,
+        },
+        2: {
+          desc: "Add concatena texto y Concatenate suma números. Las operaciones están completamente invertidas.",
+          bugLabel: "Código con bug — intercambio de operaciones",
+          bugCode: `if (selectedBuild == 2) {
+  if (selection == 0) {       // Si eligió Add...
+    selection = 4;            // ...lo cambia a Concatenate
+    isNumber = false;
+  } else if (selection == 4) {// Si eligió Concatenate...
+    selection = 0;            // ...lo cambia a Add
+    isNumber = true;
+  }
+}`,
+          fixLabel: "Corrección — se elimina el intercambio",
+          fixCode: `// Se eliminó el bloque if (selectedBuild == 2) completo.
+// Add siempre ejecuta case 0 (suma).
+// Concatenate siempre ejecuta el default (une texto).`,
+        },
+        3: {
+          desc: "Concatenate siempre trata las entradas como números. Impide concatenar texto no numérico, mostrando error de validación.",
+          bugLabel: "Código con bug — fuerza isNumber = true",
+          bugCode: `function setIfMathematical() {
+  var selection = ...value;
+  if (selectedBuild != 3) {
+    isNumber = (selection != 4);
+  } else {
+    isNumber = true; // ← Build 3 siempre trata
+  }                  //   todo como número
+}`,
+          fixLabel: "Corrección — elimina el caso especial del Build 3",
+          fixCode: `function setIfMathematical() {
+  var selection = ...value;
+  isNumber = (selection != 4);
+  // ↑ Se eliminó el if/else del Build 3.
+  // Concatenate (valor 4) nunca es numérico.
+}`,
+        },
+        4: {
+          desc: "El checkbox 'Integers only' aparece marcado y bloqueado permanentemente. El usuario no puede desmarcarlo para obtener resultados decimales.",
+          bugLabel: "Código con bug — bloquea y fuerza el checkbox",
+          bugCode: `// En setFieldStatus():
+if (selectedBuild != 4) {
+  integerSelect.disabled = false; // normal
+} else {
+  if (isNumber) {
+    integerSelect.disabled = true;  // ← bloqueado
+    integerSelect.checked  = true;  // ← forzado ON
+  }
+}`,
+          fixLabel: "Corrección — checkbox siempre opcional",
+          fixCode: `// Se eliminó el bloque else del Build 4.
+// Ahora setFieldStatus() solo controla
+// si la operación es matemática o no:
+if (isNumber) {
+  integerSelect.disabled = false; // siempre editable
+  integerSelect.hidden   = false;
+} else {
+  integerSelect.disabled = true;
+  integerSelect.checked  = false;
+}`,
+        },
+        5: {
+          desc: "El botón Clear se deshabilita automáticamente al seleccionar Build 5. Si venías de otro build con datos, no puedes limpiar los campos.",
+          bugLabel: "Código con bug — deshabilita Clear al cambiar build",
+          bugCode: `function buildChanged() {
+  selectedBuild = ...value;
+  if (selectedBuild == 5) {
+    clearButton.disabled = true;  // ← se deshabilita
+  } else {
+    clearButton.disabled = false;
+  }
+}`,
+          fixLabel: "Corrección — Clear siempre habilitado",
+          fixCode: `function buildChanged() {
+  selectedBuild = ...value;
+  clearButton.disabled = false;
+  // ↑ Se eliminó el if/else.
+  // Clear nunca se deshabilita al cambiar build.
+}`,
+        },
+        6: {
+          desc: "La división por cero no está validada. En vez de mostrar un error, devuelve Infinity, -Infinity o NaN.",
+          bugLabel: "Código con bug — omite la validación en Build 6",
+          bugCode: `case 3: // Divide
+  if (num2 == 0 && selectedBuild != 6) {
+    errorMsg = "Divide by zero error!";
+    // ↑ selectedBuild != 6 desactiva el chequeo
+    // en Build 6 nunca entra aquí → devuelve Infinity
+    return;
+  }
+  answer = num1 / num2;`,
+          fixLabel: "Corrección — validación siempre activa",
+          fixCode: `case 3: // Divide
+  if (num2 == 0) {
+    errorMsg = "Divide by zero error!";
+    // ↑ Se eliminó la condición selectedBuild != 6
+    // Ahora siempre valida división por cero
+    return;
+  }
+  answer = num1 / num2;`,
+        },
+        7: {
+          desc: "Usa el resultado anterior (answer) como primer operando en lugar del campo First Number. Cada cálculo encadena el resultado previo.",
+          bugLabel: "Código con bug — reemplaza num1 con answer",
+          bugCode: `var num1 = number1Field.value;
+var num2 = number2Field.value;
+
+if (selectedBuild == 7) {
+  num1 = answer; // ← ignora lo que escribiste
+}                //   y usa el resultado anterior`,
+          fixLabel: "Corrección — siempre lee el campo",
+          fixCode: `var num1 = number1Field.value;
+var num2 = number2Field.value;
+// ↑ Se eliminó el if (selectedBuild == 7).
+// num1 siempre viene del campo First Number,
+// nunca del resultado anterior.`,
+        },
+        8: {
+          desc: "Intercambia First Number y Second Number antes de operar. Afecta resta, división y concatenación invirtiendo el orden de los operandos.",
+          bugLabel: "Código con bug — swap de variables",
+          bugCode: `var num1 = number1Field.value;
+var num2 = number2Field.value;
+
+} else if (selectedBuild == 8) {
+  var temp = num1;
+  num1 = num2;   // ← num1 pasa a ser num2
+  num2 = temp;   // ← num2 pasa a ser num1
+}`,
+          fixLabel: "Corrección — se respeta el orden original",
+          fixCode: `var num1 = number1Field.value;
+var num2 = number2Field.value;
+// ↑ Se eliminó el bloque else if (selectedBuild == 8).
+// num1 siempre es First Number.
+// num2 siempre es Second Number.`,
+        },
+      };
+
+      function renderPanel(build) {
+        var panel = document.getElementById("bugPanel");
+        var badge = document.getElementById("panelBadge");
+        badge.textContent = build == 0 ? "Prototype" : "Build " + build;
+
+        if (build == 0 || !buildData[build]) {
+          panel.innerHTML = `
+        <div class="panel-prototype">
+          <span class="proto-icon">✓</span>
+          <p>El Prototype no tiene bugs.<br>Todas las operaciones funcionan correctamente.</p>
+        </div>`;
+          return;
+        }
+
+        var d = buildData[build];
+        panel.innerHTML = `
+      <div class="panel-section">
+        <div class="section-label bug"><span class="dot"></span>Bug identificado</div>
+        <p class="bug-desc">${d.desc}</p>
+        <div class="code-block buggy">
+          <div class="code-bar">✗ &nbsp;${d.bugLabel}</div>
+          <pre>${escHtml(d.bugCode)}</pre>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="section-label fix"><span class="dot"></span>Corrección aplicada</div>
+        <div class="code-block fixed">
+          <div class="code-bar">✓ &nbsp;${d.fixLabel}</div>
+          <pre>${escHtml(d.fixCode)}</pre>
+        </div>
+      </div>`;
+      }
+
+      function escHtml(s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
 
       function setStatusError() {
         document.getElementById("errorMsgField").textContent = errorMsg;
@@ -498,7 +851,6 @@
         var selection = document.getElementById(
           "selectOperationDropdown",
         ).value;
-        // CORRECCIÓN BUILD 3: siempre evalúa correctamente si es matemática
         isNumber = selection != 4;
       }
 
@@ -522,14 +874,9 @@
         var selection = document.getElementById(
           "selectOperationDropdown",
         ).value;
-
-        // CORRECCIÓN BUILD 7: siempre lee number1Field, nunca reutiliza answer
-        // CORRECCIÓN BUILD 8: nunca intercambia num1 y num2
         var num1 = document.getElementById("number1Field").value;
         var num2 = document.getElementById("number2Field").value;
 
-        // CORRECCIÓN BUILD 1: validación siempre activa (sin condición selectedBuild != 1)
-        // CORRECCIÓN BUILD 3: isNumber es false para Concatenate, no valida texto
         if (isNaN(num1) && isNumber) {
           errorMsg = "Number 1 is not a number";
           setStatusError();
@@ -545,40 +892,31 @@
 
         switch (+selection) {
           case 0:
-            // CORRECCIÓN BUILD 2: Add siempre suma
             answer = +num1 + +num2;
             break;
           case 1:
-            // CORRECCIÓN BUILD 8: orden correcto num1 - num2
             answer = num1 - num2;
             break;
           case 2:
-            // CORRECCIÓN BUILD 8: orden correcto num1 * num2
             answer = num1 * num2;
             break;
           case 3:
-            // CORRECCIÓN BUILD 6: división por cero siempre validada
             if (num2 == 0) {
               errorMsg = "Divide by zero error!";
               setStatusError();
               unlockCalculate();
               return;
             }
-            // CORRECCIÓN BUILD 8: orden correcto num1 / num2
             answer = num1 / num2;
             break;
           default:
-            // CORRECCIÓN BUILD 2: Concatenate siempre une texto
-            // CORRECCIÓN BUILD 8: orden correcto num1 + num2
             answer = num1 + num2;
             break;
         }
 
         displayAnswer();
         setStatusError();
-
-        var randomTimeout = parseInt(Math.random() * 1000);
-        setTimeout(unlockCalculate, randomTimeout);
+        setTimeout(unlockCalculate, parseInt(Math.random() * 1000));
       }
 
       function clearAnswer() {
@@ -598,13 +936,10 @@
           el.className = "ans-value is-empty";
           return;
         }
-
         var display = answer;
-        // CORRECCIÓN BUILD 4: parseInt solo si el usuario lo marcó voluntariamente
         if (document.getElementById("integerSelect").checked && answer !== "") {
           display = parseInt(answer);
         }
-
         el.textContent = display;
         el.className = errorMsg ? "ans-value is-error" : "ans-value is-ok";
       }
@@ -613,8 +948,8 @@
         selectedBuild = document.getElementById("selectBuild").value;
         setIfMathematical();
         setFieldStatus();
-        // CORRECCIÓN BUILD 5: Clear siempre habilitado
         document.getElementById("clearButton").disabled = false;
+        renderPanel(selectedBuild);
       }
 
       function operationChanged() {
@@ -625,7 +960,6 @@
       function setFieldStatus() {
         var intRow = document.getElementById("intRow");
         var intChk = document.getElementById("integerSelect");
-        // CORRECCIÓN BUILD 4: Integers only siempre opcional, nunca forzado
         if (isNumber) {
           intRow.classList.remove("hidden-row");
           intChk.disabled = false;
@@ -635,6 +969,8 @@
           intChk.checked = false;
         }
       }
+
+      renderPanel(0);
     </script>
   </body>
 </html>
